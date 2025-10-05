@@ -1642,36 +1642,310 @@ At Saar Healthcare, we understand that body slimming, Weight loss, Diet and Nutr
          </a>
       </div> -->
       <!-- WhatsApp Floating Button -->
-<a href="https://api.whatsapp.com/send?phone=+917870797979&text=Hi,%20welcome%20to%20Saar%20Healthcare%20!%20How%20may%20we%20help%20you?" 
+
+<style>
+  /* Floating Chat Icon */
+  .chat-icon {
+    position: fixed;
+    bottom: 80px;
+    right: 30px;
+    background-color: #25d366;
+    color: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease, background 0.3s ease;
+    animation: bounce 2.5s infinite ease-in-out;
+  }
+
+  /* 🔥 Bouncing animation */
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-10px);
+    }
+    60% {
+      transform: translateY(-5px);
+    }
+  }
+
+  .chat-icon:hover {
+    transform: scale(1.1);
+    background-color: #20b358;
+    animation: none; /* stops bounce when hovered */
+  }
+
+  /* Chat Box */
+  .chat-box {
+    position: fixed;
+    bottom: 160px;
+    right: 30px;
+    width: 330px;
+    max-height: 440px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9999;
+  }
+
+  .chat-header {
+    background-color: #25d366;
+    color: #fff;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chat-header h6 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .chat-body {
+    padding: 12px;
+    overflow-y: auto;
+    height: 300px;
+    background: #fafafa;
+    scroll-behavior: smooth;
+  }
+
+  .chat-message {
+    margin-bottom: 10px;
+    display: flex;
+  }
+
+  .chat-message.bot p {
+    background-color: #e9fbe8;
+    color: #000;
+    border-radius: 12px 12px 12px 0;
+    padding: 10px 14px;
+    max-width: 80%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .chat-message.user {
+    justify-content: flex-end;
+  }
+
+  .chat-message.user p {
+    background-color: #25d366;
+    color: #fff;
+    border-radius: 12px 12px 0 12px;
+    padding: 10px 14px;
+    max-width: 80%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .chat-input {
+    border-top: 1px solid #ddd;
+    display: flex;
+    background: #fff;
+  }
+
+  .chat-input input {
+    flex: 1;
+    border: none;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .chat-input button {
+    background: #25d366;
+    color: #fff;
+    border: none;
+    padding: 0 16px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+  }
+  .chat-input button:hover {
+    background: #20b358;
+  }
+
+  /* WhatsApp Floating Icon */
+  .whatsapp-float {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    background-color: #fff;
+    color: #25d366;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: all 0.3s ease-in-out;
+    z-index: 9999;
+  }
+  .whatsapp-float:hover {
+    background-color: #20b358;
+    color: #fff;
+    transform: scale(1.08);
+  }
+</style>
+
+<!-- ✅ Chat Icon -->
+<div class="chat-icon" id="chatToggle">
+  <i class="fas fa-user-md fa-lg"></i>
+</div>
+
+<!-- ✅ Chat Window -->
+<div class="chat-box" id="chatBox">
+  <div class="chat-header">
+    <h6 style="color:#417e00;" ><i class="fas fa-user-md"></i> Dr. Saar Assistant</h6>
+    <i class="fas fa-times" style="cursor:pointer; color: rgb(255, 255, 255);" id="chatClose"></i>
+  </div>
+  <div class="chat-body" id="chatBody">
+    <div class="chat-message bot">
+      <p>👋 Hi, I’m Saar! How can we help you today?</p>
+    </div>
+  </div>
+  <div class="chat-input">
+    <input type="text" id="chatInput" placeholder="Type here..." />
+    <button id="chatSend"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<!-- ✅ WhatsApp Icon -->
+<a href="https://api.whatsapp.com/send?phone=+917870797979&text=Hi,%20welcome%20to%20Saar%20Healthcare!%20How%20may%20we%20help%20you?" 
    class="whatsapp-float" target="_blank">
    <i class="fab fa-whatsapp"></i>
 </a>
 
-<!-- CSS -->
-<style>
-.whatsapp-float {
-  position: fixed;
-  bottom: 20px; 
-  right: 20px;
-  background-color: #25d366;
-  color: #fff;
-  border-radius: 50%;
-  width: 55px;
-  height: 55px;
-  font-size: 28px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.3s ease-in-out;
-}
-.whatsapp-float:hover {
-  transform: scale(1.1);
-  color: #fff;
-}
-</style>
+<!-- ✅ Chat Logic -->
+<script>
+  const chatToggle = document.getElementById("chatToggle");
+  const chatBox = document.getElementById("chatBox");
+  const chatClose = document.getElementById("chatClose");
+  const chatBody = document.getElementById("chatBody");
+  const chatInput = document.getElementById("chatInput");
+  const chatSend = document.getElementById("chatSend");
+
+  let step = 0;
+  let userData = { name: "", contact: "", query: "" };
+
+  chatToggle.addEventListener("click", () => chatBox.style.display = "flex");
+  chatClose.addEventListener("click", () => chatBox.style.display = "none");
+
+  chatSend.addEventListener("click", sendMessage);
+  chatInput.addEventListener("keypress", e => e.key === "Enter" && sendMessage());
+
+  function sendMessage() {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+    appendMessage("user", msg);
+    chatInput.value = "";
+    setTimeout(() => handleBotReply(msg), 500);
+  }
+
+  function appendMessage(sender, text) {
+    const div = document.createElement("div");
+    div.classList.add("chat-message", sender);
+    div.innerHTML = `<p>${text}</p>`;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  // 🔍 Improved conversational name detection
+  function extractName(message) {
+    let msg = message.toLowerCase();
+
+    const namePatterns = [
+      /my name is ([a-zA-Z ]+)/i,
+      /i am ([a-zA-Z ]+)/i,
+      /i'm ([a-zA-Z ]+)/i,
+      /me ([a-zA-Z ]+)/i,
+      /this is ([a-zA-Z ]+)/i,
+      /([a-zA-Z ]+) is my name/i,
+      /you can call me ([a-zA-Z ]+)/i,
+      /myself ([a-zA-Z ]+)/i,
+      /([a-zA-Z ]+) here/i,
+      /^([a-zA-Z ]+)$/i
+    ];
+
+    for (let pattern of namePatterns) {
+      const match = message.match(pattern);
+      if (match && match[1]) {
+        return match[1].trim().replace(/[^a-zA-Z ]/g, '');
+      }
+    }
+    return null;
+  }
+
+  function handleBotReply(msg) {
+    msg = msg.trim();
+
+    if (step === 0) {
+      appendMessage("bot", "Can you please tell me your name?");
+      step = 1;
+    }
+
+    else if (step === 1) {
+      const name = extractName(msg);
+      if (name) {
+        userData.name = name.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+        appendMessage("bot", `Your name is ${userData.name}, right? (yes or no)`);
+        step = 2;
+      } else {
+        appendMessage("bot", "Sorry, I didn’t catch your name properly. Could you please repeat it?");
+      }
+    }
+
+    else if (step === 2) {
+      if (msg.toLowerCase().includes("yes")) {
+        appendMessage("bot", `Hi ${userData.name}, can you please share your contact or WhatsApp number?`);
+        step = 3;
+      } else if (msg.toLowerCase().includes("no")) {
+        appendMessage("bot", "Okay, please tell me your correct name again.");
+        step = 1;
+      } else {
+        appendMessage("bot", "Please reply with yes or no 😊");
+      }
+    }
+
+    else if (step === 3) {
+      const number = msg.replace(/\D/g, "");
+      if (number.length >= 10 && number.length <= 13) {
+        userData.contact = number;
+        appendMessage("bot", `Got it, ${userData.name} Ji! What would you like to know or discuss today?`);
+        step = 4;
+      } else {
+        appendMessage("bot", "Please enter a valid phone or WhatsApp number (10 digits).");
+      }
+    }
+
+    else if (step === 4) {
+      userData.query = msg;
+      appendMessage("bot", "✅ Thank you! We’ve received your concern. Our team will contact you soon on your provided number.");
+      appendMessage("bot", "Have a great day! 😊");
+      step = 5;
+    }
+
+    else {
+      appendMessage("bot", "You can start again by refreshing the page or typing 'Hi'.");
+    }
+  }
+</script>
 <!-- Back To Top -->
     <!-- Library Bundle Script -->
     <script src="assets/js/core/libs.min.js"></script>
