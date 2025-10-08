@@ -291,7 +291,7 @@ $success = '';
                         <div class="sign-user_card position-relative bg-white">
                             <!-- Home Link -->
                             <div class="home-link position-absolute" style="top: 15px; left: 15px;">
-                                <a href="index.php" class="text-decoration-none d-flex align-items-center text-dark fw-semibold">
+                                <a href="index.html" class="text-decoration-none d-flex align-items-center text-dark fw-semibold">
                                     <i class="fas fa-home me-2" style="font-size: 18px; color:#25d366;"></i>
                                     <span>Home</span>
                                 </a>
@@ -299,7 +299,7 @@ $success = '';
 
                             <!-- Logo -->
                             <div class="logo-img text-center mt-4">
-                                <a href="index.php" class="navbar-brand d-inline-block mb-4">
+                                <a href="index.html" class="navbar-brand d-inline-block mb-4">
                                     <img src="assets/images/logo.png" class="img-fluid" alt="Saar Healthcare" width="150" loading="lazy">
                                 </a>
                             </div>

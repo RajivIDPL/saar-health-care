@@ -787,7 +787,7 @@ body.uikit .btn-download {
     bottom: 0;
     left: auto;
     right: 3rem;
-    background: url("../images/general/service-vector.png");
+    /* background: url("../images/main page/stuff.png"); */
     width: 556px;
     background-repeat: no-repeat;
     background-position: right center;
@@ -861,7 +861,7 @@ body.uikit .btn-download {
     bottom: 0;
     left: auto;
     right: 3rem;
-    background: url("../images/general/service-vector.png");
+    background: url("../images/main page/stuff.png");
     -webkit-background-size: contain;
     background-size: contain;
     background-repeat: no-repeat;
@@ -3039,7 +3039,7 @@ img.iq-client-img:hover {
     bottom: 0;
     left: auto;
     right: 3rem;
-    background: url("../images/pages/service-vector.png") right center no-repeat;
+    background: url("../images/main page/stuff.png") right center no-repeat;
     width: 100%;
     -webkit-transition: all .5s ease 0s;
     -o-transition: all .5s ease 0s;
