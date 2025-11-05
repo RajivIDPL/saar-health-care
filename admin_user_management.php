@@ -1,3 +1,4 @@
+<!-- admin_user_management.php -->
 <?php
 // Admin authentication for this specific file
 session_start();
@@ -90,74 +91,158 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
-// Get user medical profile for modal
-if (isset($_GET['user_id']) && isset($_GET['action']) && $_GET['action'] == 'get_medical_profile') {
+// Handle AJAX request for user medical profile
+if (isset($_GET['user_id']) && isset($_GET['action']) && $_GET['action'] === 'get_medical_profile') {
+    ob_clean(); // clear any previous output buffer
+    header('Content-Type: application/json; charset=utf-8');
+
     $user_id = intval($_GET['user_id']);
-    
+
+    // Ensure admin is authenticated
+    if (!isset($_SESSION['admin_id'])) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit;
+    }
+
     try {
-        // Get user basic info
+        // Fetch basic info
         $stmt = $conn->prepare("SELECT id, name, email, contact_no, address, created_at FROM users WHERE id = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $user_basic = $stmt->get_result()->fetch_assoc();
-        
-        // Get medical profile
-        $stmt = $conn->prepare("SELECT * FROM user_medical_profiles WHERE user_id = ?");
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $medical_profile = $stmt->get_result()->fetch_assoc();
-        
-        header('Content-Type: application/json');
+        $stmt->close();
+
+        // Fetch medical profile
+        $stmt2 = $conn->prepare("SELECT * FROM user_medical_profiles WHERE user_id = ?");
+        $stmt2->bind_param("i", $user_id);
+        $stmt2->execute();
+        $medical_profile = $stmt2->get_result()->fetch_assoc();
+        $stmt2->close();
+
         echo json_encode([
-            'basic' => $user_basic,
-            'medical' => $medical_profile
+            'basic' => $user_basic ?: null,
+            'medical' => $medical_profile ?: null
         ]);
         exit;
-        
     } catch (Exception $e) {
-        error_log("Error fetching medical profile: " . $e->getMessage());
-        header('Content-Type: application/json');
-        echo json_encode(['error' => 'Failed to fetch medical profile']);
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to fetch medical profile.']);
         exit;
     }
 }
-?>
 
+
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin Dashboard - Saar Healthcare</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
     <style>
+        /* Reset & base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
+            color: #343a40;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* Navbar */
         .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1d972dff 0%, #2ba170ff 100%);
             color: white;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         .navbar-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        .navbar-actions {
-            display: flex;
-            align-items: center;
             gap: 1rem;
         }
+        .navbar-brand { font-size: 1.25rem; font-weight: 600; display:flex; align-items:center; gap:10px; }
+        .navbar-actions { display:flex; align-items:center; gap:1rem; }
+        .welcome-text { font-size: 1rem; opacity: 0.95; }
+        .btn-logout {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            padding: 0.45rem 0.9rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform .18s ease, background .18s ease;
+        }
+        .btn-logout:hover { transform: translateY(-2px); background: rgba(255,255,255,0.25); }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="Main Navigation">
+        <div class="navbar-content">
+            <div class="navbar-brand">
+                <i class="fas fa-heartbeat" aria-hidden="true"></i>
+                Saar Healthcare - User Management Dashboard
+            </div>
+            <div class="navbar-actions">
+                <span class="welcome-text">Welcome, <?php echo htmlspecialchars($_SESSION['admin_name']); ?></span>
+                <a href="?logout=true" class="btn-logout" aria-label="Logout">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+    <!-- Navigation Buttons Section -->
+    <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1.2rem 2rem; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <a href="index.php" 
+        style="display: inline-flex; align-items: center; gap: 8px; 
+                background: #2ba170; color: white; text-decoration: none; 
+                padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 500; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s ease;">
+            <i class="fas fa-home"></i> Home
+        </a>
+
+        <a href="admin_dashboard.php" 
+        style="display: inline-flex; align-items: center; gap: 8px; 
+                background: #0db3b9; color: white; text-decoration: none; 
+                padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 500; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s ease;">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="admin_doctor_availability.php" 
+        style="display: inline-flex; align-items: center; gap: 8px; 
+                background: #007bff; color: white; text-decoration: none; 
+                padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 500; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s ease;">
+            <i class="fas fa-user-md"></i> Availability
+        </a>
+
+        <a href="admin_appointment_management.php" 
+        style="display: inline-flex; align-items: center; gap: 8px; 
+                background: #e25886; color: white; text-decoration: none; 
+                padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 500; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s ease;">
+            <i class="fas fa-users"></i> Appointment Details
+        </a>
+    </div>
+
+
+    <style>
         .container {
             max-width: 1400px;
             margin: 2rem auto;
@@ -534,12 +619,10 @@ if (isset($_GET['user_id']) && isset($_GET['action']) && $_GET['action'] == 'get
             100% { transform: rotate(360deg); }
         }
     </style>
-</head>
-<body>
     <div class="container">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
-            <h1>User Management Dashboard</h1>
+            <h1>Saar Members Details</h1>
             <p>Manage and view all registered users and their medical profiles</p>
         </div>
 
@@ -577,7 +660,7 @@ if (isset($_GET['user_id']) && isset($_GET['action']) && $_GET['action'] == 'get
                 <?php endif; ?>
             </form>
         </div>
-<!-- Users Table -->
+    <!-- Users Table -->
         <div class="users-table">
             <div class="table-header">
                 <h3 style="margin: 0;">Registered Users (<?php echo count($users); ?> found)</h3>
@@ -710,115 +793,220 @@ class UserModal {
         this.showLoading();
 
         try {
-            const response = await fetch(`?user_id=${userId}&action=get_medical_profile`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            const url = `?user_id=${encodeURIComponent(userId)}&action=get_medical_profile`;
+            console.log('DEBUG: Fetching URL:', url);
 
-            const data = await response.json();
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: { 
+                    'Accept': 'application/json, text/plain, */*',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
 
-            if (data.error) {
-                this.showError(data.error);
+            console.log('DEBUG: Response status:', response.status);
+            console.log('DEBUG: Response headers:', Object.fromEntries([...response.headers]));
+
+            const rawText = await response.text();
+            console.log('DEBUG: Raw response (first 200 chars):', rawText.substring(0, 200));
+
+            // Check if response is HTML (starts with <) or contains common HTML tags
+            const isHtml = rawText.trim().startsWith('<') || 
+                        rawText.includes('<!DOCTYPE') || 
+                        rawText.includes('<html') || 
+                        rawText.includes('<body');
+
+            if (isHtml) {
+                console.warn('DEBUG: Server returned HTML instead of JSON');
+                
+                // Check for common error patterns in HTML
+                let errorMessage = 'Server returned HTML instead of JSON data. ';
+                
+                if (rawText.includes('404') || rawText.includes('Not Found')) {
+                    errorMessage += 'Page not found (404).';
+                } else if (rawText.includes('403') || rawText.includes('Forbidden')) {
+                    errorMessage += 'Access forbidden (403).';
+                } else if (rawText.includes('500') || rawText.includes('Internal Server Error')) {
+                    errorMessage += 'Server error (500).';
+                } else if (rawText.includes('wp-login') || rawText.includes('login')) {
+                    errorMessage += 'Redirected to login page. You may need to log in.';
+                } else if (rawText.includes('PHP Error') || rawText.includes('Fatal error')) {
+                    errorMessage += 'PHP error detected. Check server logs.';
+                }
+
+                this.modalContent.innerHTML = `
+                    <div style="padding:1.5rem;">
+                        <div class="no-data">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                            <h3>Server Response Error</h3>
+                            <p>${errorMessage}</p>
+                            <p><strong>Status Code:</strong> ${response.status}</p>
+                            
+                            <details style="margin-top: 1rem; text-align: left;">
+                                <summary style="cursor: pointer; color: #007bff;">Show Raw Response (Debug)</summary>
+                                <pre style="white-space:pre-wrap; word-break:break-word; background:#f7f7f7; padding:1rem; border-radius:6px; margin-top: 0.5rem; max-height: 300px; overflow: auto; font-size: 12px;">${this.escapeHtml(rawText)}</pre>
+                            </details>
+                            
+                            <div style="margin-top: 1.5rem;">
+                                <button class="btn btn-primary" onclick="userModal.hide()">Close</button>
+                                <button class="btn btn-secondary" onclick="window.open('${url}', '_blank')" style="margin-left: 0.5rem;">
+                                    Open URL in New Tab
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
                 return;
             }
 
-            this.renderUserData(data);
-        } catch (error) {
-            console.error('Error fetching user details:', error);
-            this.showError('Failed to load user details. Please try again.');
+            // Try to parse as JSON
+            try {
+                const data = JSON.parse(rawText);
+                console.log('DEBUG: Successfully parsed JSON:', data);
+                this.renderUserData(data);
+            } catch (parseError) {
+                console.error('DEBUG: JSON parse error:', parseError);
+                throw new Error(`Invalid JSON format: ${parseError.message}`);
+            }
+
+        } catch (err) {
+            console.error('DEBUG: Fetch error:', err);
+            this.showError(`Failed to load user details: ${err.message}`);
         }
     }
+
 
     renderUserData(data) {
         const basic = data.basic || {};
         const medical = data.medical || {};
 
+        const safe = (v) => v ? this.escapeHtml(v) : 'N/A';
+        const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        }) : 'N/A';
+
         this.modalContent.innerHTML = `
-            <div class="info-grid">
-                <div class="info-section">
+            <style>
+                .user-details-container {
+                    padding: 1.5rem;
+                    color: #222;
+                    font-family: 'Inter', sans-serif;
+                    background: linear-gradient(145deg, #ffffff, #f4f7fb);
+                    border-radius: 16px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                    animation: fadeIn 0.3s ease;
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                .user-section {
+                    background: #fff;
+                    border-radius: 12px;
+                    padding: 1.25rem 1.5rem;
+                    margin-bottom: 1.25rem;
+                    box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+                    border-left: 4px solid #4a90e2;
+                }
+
+                .user-section h3 {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: #4a90e2;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    margin-bottom: 1rem;
+                }
+
+                .user-details-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                    gap: 0.75rem 1.25rem;
+                }
+
+                .detail-item label {
+                    font-size: 0.85rem;
+                    color: #666;
+                    display: block;
+                    margin-bottom: 0.25rem;
+                    font-weight: 500;
+                }
+
+                .detail-item span {
+                    font-size: 0.95rem;
+                    color: #111;
+                    background: #f9fafc;
+                    display: inline-block;
+                    padding: 0.4rem 0.6rem;
+                    border-radius: 6px;
+                    border: 1px solid #e3e8ef;
+                    font-weight: 600;
+                }
+
+                .modal-actions {
+                    text-align: center;
+                    margin-top: 1.5rem;
+                }
+
+                .modal-actions .btn {
+                    background: linear-gradient(90deg, #4a90e2, #6fb1fc);
+                    border: none;
+                    color: #fff;
+                    padding: 0.6rem 1.5rem;
+                    font-size: 0.95rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    box-shadow: 0 3px 8px rgba(74, 144, 226, 0.3);
+                    transition: all 0.25s ease;
+                }
+
+                .modal-actions .btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 12px rgba(74, 144, 226, 0.4);
+                }
+            </style>
+
+            <div class="user-details-container">
+                <div class="user-section">
                     <h3><i class="fas fa-user"></i> Basic Information</h3>
-                    ${basic.id ? `
-                        <div class="info-item">
-                            <span class="info-label">User ID:</span>
-                            <span class="info-value">${this.escapeHtml(basic.id)}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Full Name:</span>
-                            <span class="info-value">${this.escapeHtml(basic.name || 'N/A')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Email:</span>
-                            <span class="info-value">${this.escapeHtml(basic.email || 'N/A')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Contact:</span>
-                            <span class="info-value">${this.escapeHtml(basic.contact_no || 'N/A')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Address:</span>
-                            <span class="info-value">${this.escapeHtml(basic.address || 'N/A')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Registered:</span>
-                            <span class="info-value">${new Date(basic.created_at).toLocaleDateString()}</span>
-                        </div>
-                    ` : '<div class="no-data">No basic information available</div>'}
+                    <div class="user-details-grid">
+                        <div class="detail-item"><label>User ID:</label><span>${safe(basic.id)}</span></div>
+                        <div class="detail-item"><label>Name:</label><span>${safe(basic.name)}</span></div>
+                        <div class="detail-item"><label>Email:</label><span>${safe(basic.email)}</span></div>
+                        <div class="detail-item"><label>Contact No:</label><span>${safe(basic.contact_no)}</span></div>
+                        <div class="detail-item"><label>Address:</label><span>${safe(basic.address)}</span></div>
+                        <div class="detail-item"><label>Registration Date:</label><span>${formatDate(basic.created_at)}</span></div>
+                    </div>
                 </div>
 
-                <div class="info-section">
-                    <h3><i class="fas fa-heartbeat"></i> Medical Profile</h3>
-                    ${medical.first_name ? `
-                        <div class="info-item">
-                            <span class="info-label">First Name:</span>
-                            <span class="info-value">${this.escapeHtml(medical.first_name)}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Last Name:</span>
-                            <span class="info-value">${this.escapeHtml(medical.last_name || 'N/A')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Age:</span>
-                            <span class="info-value">${this.escapeHtml(medical.age || 'N/A')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Weight:</span>
-                            <span class="info-value">${medical.weight ? this.escapeHtml(medical.weight) + ' kg' : 'N/A'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Height:</span>
-                            <span class="info-value">${medical.height ? this.escapeHtml(medical.height) + ' cm' : 'N/A'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Blood Group:</span>
-                            <span class="info-value">${this.escapeHtml(medical.blood_group || 'N/A')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Allergies:</span>
-                            <span class="info-value">${this.escapeHtml(medical.allergies || 'None reported')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Emergency Contact:</span>
-                            <span class="info-value">${this.escapeHtml(medical.emergency_contact_name || 'N/A')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Emergency Phone:</span>
-                            <span class="info-value">${this.escapeHtml(medical.emergency_contact_number || 'N/A')}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Last Updated:</span>
-                            <span class="info-value">${new Date(medical.updated_at || medical.created_at).toLocaleDateString()}</span>
-                        </div>
-                    ` : '<div class="no-data">No medical profile found for this user</div>'}
+                <div class="user-section">
+                    <h3><i class="fas fa-heartbeat"></i> Medical Information</h3>
+                    <div class="user-details-grid">
+                        <div class="detail-item"><label>First Name:</label><span>${safe(medical.first_name)}</span></div>
+                        <div class="detail-item"><label>Last Name:</label><span>${safe(medical.last_name)}</span></div>
+                        <div class="detail-item"><label>Age:</label><span>${safe(medical.age)}</span></div>
+                        <div class="detail-item"><label>Weight:</label><span>${safe(medical.weight)} ${medical.weight ? 'kg' : ''}</span></div>
+                        <div class="detail-item"><label>Height:</label><span>${safe(medical.height)} ${medical.height ? 'ft' : ''}</span></div>
+                        <div class="detail-item"><label>Blood Group:</label><span>${safe(medical.blood_group)}</span></div>
+                        <div class="detail-item"><label>Allergies:</label><span>${safe(medical.allergies)}</span></div>
+                        <div class="detail-item"><label>Emergency Contact Name:</label><span>${safe(medical.emergency_contact_name)}</span></div>
+                        <div class="detail-item"><label>Emergency Contact Number:</label><span>${safe(medical.emergency_contact_number)}</span></div>
+                        <div class="detail-item"><label>Created At:</label><span>${formatDate(medical.created_at)}</span></div>
+                        <div class="detail-item"><label>Last Updated:</label><span>${formatDate(medical.updated_at)}</span></div>
+                    </div>
                 </div>
-            </div>
-            <div style="text-align: center; margin-top: 2rem;">
-                <button class="btn btn-primary" onclick="userModal.hide()">
-                    <i class="fas fa-times"></i> Close
-                </button>
+
+                <div class="modal-actions">
+                    <button class="btn" onclick="userModal.hide()"><i class="fas fa-times"></i> Close</button>
+                </div>
             </div>
         `;
     }
+
 
     escapeHtml(unsafe) {
         if (unsafe === null || unsafe === undefined) return 'N/A';

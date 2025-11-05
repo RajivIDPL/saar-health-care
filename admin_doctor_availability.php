@@ -1,3 +1,4 @@
+<!-- admin_doctor_availability.php -->
 <?php
 session_start();
 require_once 'db_connect.php';
@@ -17,6 +18,110 @@ $specializations_query = "SELECT COUNT(DISTINCT full_name) as spec_count FROM ad
 $spec_result = mysqli_query($conn, $specializations_query);
 $spec_count = mysqli_fetch_assoc($spec_result)['spec_count'];
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin Dashboard - Saar Healthcare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <style>
+        /* Reset & base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #1d972dff 0%, #2ba170ff 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .navbar-brand { font-size: 1.25rem; font-weight: 600; display:flex; align-items:center; gap:10px; }
+        .navbar-actions { display:flex; align-items:center; gap:1rem; }
+        .welcome-text { font-size: 1rem; opacity: 0.95; }
+        .btn-logout {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            padding: 0.45rem 0.9rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform .18s ease, background .18s ease;
+        }
+        .btn-logout:hover { transform: translateY(-2px); background: rgba(255,255,255,0.25); }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="Main Navigation">
+        <div class="navbar-content">
+            <div class="navbar-brand">
+                <i class="fas fa-heartbeat" aria-hidden="true"></i>
+                Saar Healthcare - Availability Dashboard
+            </div>
+            <div class="navbar-actions">
+                <span class="welcome-text">Welcome, <?php echo htmlspecialchars($_SESSION['admin_name']); ?></span>
+                <a href="?logout=true" class="btn-logout" aria-label="Logout">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+    <!-- Navigation Buttons Section -->
+    <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1.2rem 2rem; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <a href="index.php" 
+        style="display: inline-flex; align-items: center; gap: 8px; 
+                background: #2ba170; color: white; text-decoration: none; 
+                padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 500; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s ease;">
+            <i class="fas fa-home"></i> Home
+        </a>
+
+        <a href="admin_dashboard.php" 
+        style="display: inline-flex; align-items: center; gap: 8px; 
+                background: #0db3b9; color: white; text-decoration: none; 
+                padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 500; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s ease;">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="admin_appointment_management.php" 
+        style="display: inline-flex; align-items: center; gap: 8px; 
+                background: #007bff; color: white; text-decoration: none; 
+                padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 500; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s ease;">
+            <i class="fas fa-user-md"></i> Appointment Details
+        </a>
+
+        <a href="admin_user_management.php" 
+        style="display: inline-flex; align-items: center; gap: 8px; 
+                background: #e25886; color: white; text-decoration: none; 
+                padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 500; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s ease;">
+            <i class="fas fa-users"></i> User Details
+        </a>
+    </div>
 
 <style>
 .doctor-content {
@@ -268,7 +373,7 @@ th {
         </div>
     </div>
 
-    <button class="add-btn" id="openAddDoctorBtn"><i class="fas fa-user-md"></i> Add Doctor</button>
+    <button class="add-btn" id="openAddDoctorBtn"><i class="fas fa-user-md"></i> Add New Admin</button>
     <button class="add-btn btn-success" id="openAddTimeBtn"><i class="fas fa-clock"></i> Add Your Time</button>
 
     <!-- Doctors List Section -->
@@ -278,7 +383,7 @@ th {
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Doctor Name</th>
+                    <th>Admin Name</th>
                     <th>Contact</th>
                     <th>Email</th>
                     <th>Joined Date</th>
@@ -331,13 +436,13 @@ th {
 <div id="addDoctorModal" class="modal">
     <div class="modal-content">
         <span class="close" id="closeDoctorModal">&times;</span>
-        <h2>Add New Doctor</h2>
+        <h2>Make Admin Panel</h2>
         <form id="addDoctorForm">
             <input type="text" name="full_name" placeholder="Full Name" required>
             <input type="text" name="contact" placeholder="Contact Number" required>
             <input type="email" name="email" placeholder="Email Address" required>
             <input type="password" name="password" placeholder="Password" required>
-            <button type="submit" class="save-btn" style="width: 100%; margin-top: 10px;">Add Doctor</button>
+            <button type="submit" class="save-btn" style="width: 100%; margin-top: 10px;">Add Admin</button>
         </form>
     </div>
 </div>
@@ -410,6 +515,8 @@ th {
         </form>
     </div>
 </div>
+            </body>
+
 
 <script>
 // Modal controls

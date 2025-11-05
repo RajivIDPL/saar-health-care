@@ -1,3 +1,4 @@
+<!-- admin_dashboard.php -->
 <?php
 // Admin authentication
 session_start();
@@ -16,357 +17,265 @@ if (isset($_GET['logout'])) {
     exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin Dashboard - Saar Healthcare</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        /* Reset & base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
+            color: #343a40;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        
+
+        /* Navbar */
         .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1d972dff 0%, #2ba170ff 100%);
             color: white;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
             z-index: 100;
         }
-        
         .navbar-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .navbar-actions {
-            display: flex;
-            align-items: center;
             gap: 1rem;
         }
-        
-        .welcome-text {
-            margin: 0;
-            font-size: 1.1rem;
-        }
-        
+        .navbar-brand { font-size: 1.25rem; font-weight: 600; display:flex; align-items:center; gap:10px; }
+        .navbar-actions { display:flex; align-items:center; gap:1rem; }
+        .welcome-text { font-size: 1rem; opacity: 0.95; }
         .btn-logout {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.25);
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
+            padding: 0.45rem 0.9rem;
+            border-radius: 6px;
             text-decoration: none;
-            transition: all 0.3s;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            transition: transform .18s ease, background .18s ease;
         }
-        
-        .btn-logout:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-        
+        .btn-logout:hover { transform: translateY(-2px); background: rgba(255,255,255,0.25); }
+
+        /* Container */
         .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 16px;
         }
-        
-        .tabs-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
-            margin: 2rem 0;
-            overflow: hidden;
-        }
-        
-        .tabs-header {
+
+        /* Header area above cards */
+        .dash-header {
             display: flex;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-bottom: 2px solid #e9ecef;
-        }
-        
-        .tab-btn {
-            flex: 1;
-            padding: 1.5rem 2rem;
-            background: none;
-            border: none;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #6c757d;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            gap: 16px;
+            margin-bottom: 1.25rem;
+        }
+        .dash-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #222;
+        }
+        .dash-sub {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        /* Cards grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        @media (max-width: 900px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Card style */
+        .card {
+            display: block;
+            text-decoration: none;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);
+            border-radius: 14px;
+            padding: 1.6rem;
+            box-shadow: 0 8px 30px rgba(102,126,234,0.08);
+            transition: transform .18s ease, box-shadow .18s ease;
+            border: 1px solid rgba(102,126,234,0.06);
+            color: inherit;
+            min-height: 140px;
             position: relative;
             overflow: hidden;
         }
-        
-        .tab-btn:hover {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 40px rgba(102,126,234,0.14);
         }
-        
-        .tab-btn.active {
-            background: white;
-            color: #667eea;
-            box-shadow: 0 -3px 0 #667eea inset;
-        }
-        
-        .tab-btn i {
-            font-size: 1.3rem;
-            transition: transform 0.3s ease;
-        }
-        
-        .tab-btn.active i {
-            transform: scale(1.1);
-            color: #667eea;
-        }
-        
-        .tab-content {
-            display: none;
-            padding: 0;
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .loading-spinner {
-            display: flex;
-            justify-content: center;
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            display: inline-flex;
             align-items: center;
-            padding: 3rem;
-            color: #667eea;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(118,75,162,0.08));
+            color: #4b3db0;
+            margin-bottom: 12px;
         }
-        
-        .loading-spinner i {
-            font-size: 2rem;
-            animation: spin 1s linear infinite;
+        .card h3 {
+            font-size: 1.12rem;
+            margin-bottom: 8px;
+            color: #2d2b63;
         }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .card p {
+            font-size: 0.95rem;
+            color: #6c757d;
+            line-height: 1.35;
         }
-        
-        .error-message {
-            text-align: center;
-            padding: 3rem;
-            color: #dc3545;
+
+        /* small arrow */
+        .card .arrow {
+            position: absolute;
+            right: 14px;
+            bottom: 14px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            transform: translateX(0);
+            transition: transform .18s ease;
         }
-        
-        .error-message i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+        .card:hover .arrow { transform: translateX(6px); }
+
+        /* subtle badge for counts (optional) */
+        .badge {
+            display: inline-block;
+            background: rgba(102,126,234,0.12);
+            color: #3f3aa8;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            margin-left: 8px;
+        }
+
+        /* Footer / small note */
+        .small-note {
+            margin-top: 1rem;
+            color: #6c757d;
+            font-size: 0.92rem;
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="navbar" role="navigation" aria-label="Main Navigation">
         <div class="navbar-content">
             <div class="navbar-brand">
-                <i class="fas fa-heartbeat"></i>
+                <i class="fas fa-heartbeat" aria-hidden="true"></i>
                 Saar Healthcare - Admin Dashboard
             </div>
             <div class="navbar-actions">
                 <span class="welcome-text">Welcome, <?php echo htmlspecialchars($_SESSION['admin_name']); ?></span>
-                <a href="?logout=true" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i>
+                <a href="?logout=true" class="btn-logout" aria-label="Logout">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
                     Logout
                 </a>
             </div>
         </div>
     </nav>
-
-    <div class="dashboard-container">
-        <!-- Tabs Navigation -->
-        <div class="tabs-container">
-            <div class="tabs-header">
-                <button class="tab-btn active" data-tab="user_management">
-                    <i class="fas fa-users"></i>
-                    User Management
-                </button>
-                <button class="tab-btn" data-tab="appointment_management">
-                    <i class="fas fa-calendar-check"></i>
-                    Appointment Management
-                </button>
-                <button class="tab-btn" data-tab="doctor_availability">
-                    <i class="fas fa-user-md"></i>
-                    Doctor Availability
-                </button>
-            </div>
-
-            <!-- Tab Contents -->
-            <div class="tab-content active" id="user_management">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner"></i>
-                </div>
-            </div>
-
-            <div class="tab-content" id="appointment_management">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner"></i>
-                </div>
-            </div>
-
-            <div class="tab-content" id="doctor_availability">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner"></i>
-                </div>
-            </div>
-        </div>
+    <!-- Home Button Section -->
+    <div style="padding: 1rem 2rem;">
+        <a href="index.php" 
+        class="btn-home" 
+        style="display: inline-flex; align-items: center; gap: 8px; background: #2ba170; color: white; 
+                text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s ease;">
+            <i class="fas fa-home" aria-hidden="true"></i>
+            Home
+        </a>
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-        
-        // Load initial tab content
-        loadTabContent('user_management');
-        
-        // Tab click event
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const tabId = this.getAttribute('data-tab');
-                
-                // Remove active class from all tabs
-                tabBtns.forEach(b => b.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab
-                this.classList.add('active');
-                document.getElementById(tabId).classList.add('active');
-                
-                // Load tab content
-                loadTabContent(tabId);
+
+    <main class="dashboard-container" role="main">
+        <div class="dash-header">
+            <div>
+                <div class="dash-title">Quick Actions</div>
+                <div class="dash-sub">Click a card to open that management screen.</div>
+            </div>
+            <div class="dash-meta" aria-hidden="true">
+                <!-- Optional: add a small context badge or stats here -->
+            </div>
+        </div>
+
+        <section class="cards-grid" aria-label="Admin navigation cards">
+            <!-- Card: User Management -->
+            <a class="card" href="admin_user_management.php" role="link" aria-label="Open User Management">
+                <div class="card-icon" aria-hidden="true">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>User Management <span class="badge">Manage</span></h3>
+                <p>View, edit, and manage registered users — activate/deactivate accounts, reset passwords, and review user details.</p>
+                <div class="arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Card: Appointment Management -->
+            <a class="card" href="admin_appointment_management.php" role="link" aria-label="Open Appointment Management">
+                <div class="card-icon" aria-hidden="true">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Appointment Management <span class="badge">Schedule</span></h3>
+                <p>Create, update, and monitor appointments. Approve or reschedule bookings and notify patients as needed.</p>
+                <div class="arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Card: Doctor Availability -->
+            <a class="card" href="admin_doctor_availability.php" role="link" aria-label="Open Doctor Availability">
+                <div class="card-icon" aria-hidden="true">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h3>Doctor Availability <span class="badge">Timetable</span></h3>
+                <p>Manage doctor schedules, set availability windows, and sync timings to ensure smooth appointment allocations.</p>
+                <div class="arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+            </a>
+        </section>
+
+        <div class="small-note">
+            Tip: Right-click a card and choose "Open in new tab" to keep the dashboard open while you work.
+        </div>
+    </main>
+
+    <script>
+        // Optional JS: enhance keyboard accessibility - allow Enter on focused card to open link
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.setAttribute('tabindex', '0'); // make focusable
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        // follow the anchor
+                        window.location.href = card.getAttribute('href');
+                    }
+                });
             });
         });
-        
-        function loadTabContent(tabId) {
-            const tabContent = document.getElementById(tabId);
-            
-            // Show loading spinner
-            tabContent.innerHTML = `
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner"></i>
-                </div>
-            `;
-            
-            // Map tab IDs to file names
-            const fileMap = {
-                'user_management': 'admin_user_management.php',
-                'appointment_management': 'admin_appointment_management.php',
-                'doctor_availability': 'admin_doctor_availability.php'
-            };
-            
-            const fileName = fileMap[tabId];
-            
-            if (!fileName) {
-                showError(tabContent, 'Invalid tab configuration');
-                return;
-            }
-            
-            // Load content via AJAX
-            fetch(fileName)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(html => {
-                    // Check if we got valid HTML content
-                    if (html.trim() === '' || html.includes('Unauthorized access')) {
-                        throw new Error('Empty response or unauthorized');
-                    }
-                    tabContent.innerHTML = html;
-                    
-                    // Re-initialize any scripts in the loaded content
-                    initializeTabScripts(tabId);
-                })
-                .catch(error => {
-                    console.error('Error loading tab content:', error);
-                    showError(tabContent, error.message);
-                });
-        }
-        
-        function showError(tabContent, message) {
-            tabContent.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>Failed to load content</h3>
-                    <p>Error: ${message}</p>
-                    <p>Please check if the file exists and try again.</p>
-                </div>
-            `;
-        }
-        
-        function initializeTabScripts(tabId) {
-            console.log(`Initializing scripts for: ${tabId}`);
-            
-            // Reinitialize modal functionality for user management tab
-            if (tabId === 'user_management') {
-                // Wait a bit for the DOM to be fully loaded
-                setTimeout(() => {
-                    if (typeof initializeModal === 'function') {
-                        initializeModal();
-                    }
-                }, 100);
-            }
-            
-            // Reinitialize appointment management scripts if needed
-            if (tabId === 'appointment_management') {
-                // Reinitialize any appointment management scripts here
-                setTimeout(() => {
-                    if (typeof updateCountdowns === 'function') {
-                        updateCountdowns();
-                    }
-                }, 100);
-            }
-        }
-    });
-</script>
+    </script>
 </body>
 </html>
