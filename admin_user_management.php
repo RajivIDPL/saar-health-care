@@ -143,20 +143,23 @@ if (isset($_GET['user_id']) && isset($_GET['action']) && $_GET['action'] === 'ge
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin Dashboard - Saar Healthcare</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&family=Comfortaa:wght@500;700&display=swap" rel="stylesheet">
+
     <style>
         /* Reset & base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Lexend', sans-serif;
             background-color: #f8f9fa;
             color: #343a40;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
-
+        
         /* Navbar */
         .navbar {
+            font-family: 'Comfortaa', cursive;
             background: linear-gradient(135deg, #1d972dff 0%, #2ba170ff 100%);
             color: white;
             padding: 1rem 2rem;

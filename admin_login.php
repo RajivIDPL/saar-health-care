@@ -212,7 +212,7 @@ unset($_SESSION['success']);
             <div class="admin-login-card">
                 <!-- Back Link -->
                 <div class="back-link">
-                    <a href="index.html" class="text-decoration-none d-flex align-items-center text-dark">
+                    <a href="index.php" class="text-decoration-none d-flex align-items-center text-dark">
                         <i class="fas fa-arrow-left me-2"></i>
                         <span>Back to Site</span>
                     </a>

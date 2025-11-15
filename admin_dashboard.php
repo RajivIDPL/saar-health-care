@@ -24,11 +24,15 @@ if (isset($_GET['logout'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin Dashboard - Saar Healthcare</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&family=Comfortaa:wght@500;700&display=swap" rel="stylesheet">
+
     <style>
         /* Reset & base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Lexend', sans-serif;
+            /* font-family: 'Comfortaa', cursive; */
+            /* font-family: 'Roboto', sans-serif; */
             background-color: #f8f9fa;
             color: #343a40;
             min-height: 100vh;
@@ -38,6 +42,7 @@ if (isset($_GET['logout'])) {
 
         /* Navbar */
         .navbar {
+            font-family: 'Comfortaa', cursive;
             background: linear-gradient(135deg, #1d972dff 0%, #2ba170ff 100%);
             color: white;
             padding: 1rem 2rem;
@@ -240,7 +245,7 @@ if (isset($_GET['logout'])) {
                 <div class="card-icon" aria-hidden="true">
                     <i class="fas fa-calendar-check"></i>
                 </div>
-                <h3>Appointment Management <span class="badge">Schedule</span></h3>
+                <h3>Appointment Activity <span class="badge">Schedule</span></h3>
                 <p>Create, update, and monitor appointments. Approve or reschedule bookings and notify patients as needed.</p>
                 <div class="arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
             </a>
